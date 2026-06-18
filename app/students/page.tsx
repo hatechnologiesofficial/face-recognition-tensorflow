@@ -7,6 +7,7 @@ import {
   Button,
   Card,
   Progress,
+  QRCode,
   Space,
   Table,
   Tag,
@@ -59,7 +60,7 @@ export default function StudentsPage() {
         width: 190,
       },
       {
-        title: "Student",
+        title: "Name",
         dataIndex: "name",
         key: "name",
         width: 260,
@@ -84,6 +85,12 @@ export default function StudentsPage() {
         width: 130,
         render: (semester: string) => <Tag color="geekblue">Semester {semester}</Tag>,
       },
+      {
+        title:"QR",
+        key:"qr",
+        width: 120,
+        render:(item,items)=><QRCode value={items._id}/>
+      }
 
     ],
     [],
