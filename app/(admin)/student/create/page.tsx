@@ -1,7 +1,7 @@
 "use client";
 
 import { SaveOutlined } from "@ant-design/icons";
-import { Alert, App, Button, Card, Form, Input, Select, Space, Typography } from "antd";
+import { Alert, App, Button, Card, Form, Input, Select, Space, Typography, Upload, UploadProps } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AppShell } from "../../../components/AppShell";
@@ -11,6 +11,8 @@ type StudentFormValues = {
   enrollmentNumber: string;
   name: string;
   semester: string;
+  introduction: string,
+  image: string
 };
 
 const branchOptions = [
@@ -31,13 +33,22 @@ const semesterOptions = Array.from({ length: 8 }, (_, index) => {
   };
 });
 
+
+const getBase64 = (img: any, callback: (url: string) => void) => {
+  const reader = new FileReader();
+  reader.addEventListener('load', () => callback(reader.result as string));
+  reader.readAsDataURL(img);
+};
+
 export default function CreateStudentPage() {
   const router = useRouter();
   const { message } = App.useApp();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [imageBase64, setImageBase64] = useState("")
 
   const handleSubmit = async (value: StudentFormValues) => {
+    value.image = imageBase64
     const response = await fetch("/api/students", {
       method: "POST",
       headers: {
@@ -50,6 +61,13 @@ export default function CreateStudentPage() {
     }
 
   }
+
+  const handleChange: UploadProps['onChange'] = (info) => {
+    getBase64(info.file.originFileObj as any, (url) => {
+      console.log("getBase64 url", url);
+      setImageBase64(url)
+    });
+  };
 
 
   return (
@@ -75,6 +93,20 @@ export default function CreateStudentPage() {
             onFinish={handleSubmit}
           >
             <div className="student-form-grid">
+              <Form.Item>
+                <Upload
+                  accept={"image/png"}
+                  name="avatar"
+                  listType="picture-circle"
+                  showUploadList={false}
+                  // beforeUpload={beforeUpload}
+                  onChange={handleChange}
+                >
+                  {imageBase64 ? <img src={imageBase64} /> :
+                    <p>Select Image</p>}
+                </Upload>
+
+              </Form.Item>
               <Form.Item
                 label="Student name"
                 name="name"
@@ -107,6 +139,9 @@ export default function CreateStudentPage() {
                 rules={[{ required: true, message: "Semester is required" }]}
               >
                 <Select placeholder="Select semester" options={semesterOptions} />
+              </Form.Item>
+              <Form.Item label="Introduction" name={"introduction"}>
+                <Input.TextArea />
               </Form.Item>
             </div>
 

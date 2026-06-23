@@ -10,7 +10,7 @@ export async function GET(request: Request,
         await client.connect();
         const db = client.db("ists")
         const myCollection = db.collection("students")
-        const result = await myCollection.findOne({ enrollmentNumber: Number(enrollmentNumber) })
+        const result = await myCollection.findOne({ enrollmentNumber: String(enrollmentNumber) })
         if(result){
             return Response.json(result , { status: 200 });
         }else{

@@ -30,6 +30,12 @@ export async function POST(request: Request) {
     if (!body.semester) {
         return Response.json({ message: "Semester is required" }, { status: 400 })
     }
+    if (!body.image) {
+        return Response.json({ message: "Image is required" }, { status: 400 })
+    }
+    if (!body.introduction) {
+        return Response.json({ message: "Introduction is required" }, { status: 400 })
+    }
     const client = new MongoClient(process.env.MONGODB_URI as string);
 
     try {
@@ -42,9 +48,11 @@ export async function POST(request: Request) {
         }
         const result = await myCollection.insertOne({
             name: body.name,
-            enrollmentNumber: body.enrollmentNumber,
+            enrollmentNumber: String(body.enrollmentNumber),
             branch: body.branch,
-            semester: body.semester
+            semester: body.semester,
+            image:body.image,
+            introduction:body.introduction
         })
         if (result) {
             return Response.json({
