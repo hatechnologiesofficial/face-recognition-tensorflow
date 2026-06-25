@@ -7,7 +7,7 @@ export async function GET() {
         const myCollection = db.collection("students")
         const result = await myCollection.find().toArray()
 
-        return Response.json(result , { status: 200 });
+        return Response.json(result, { status: 200 });
     } catch {
         return Response.json(
             { message: "not connected" },
@@ -51,8 +51,11 @@ export async function POST(request: Request) {
             enrollmentNumber: String(body.enrollmentNumber),
             branch: body.branch,
             semester: body.semester,
-            image:body.image,
-            introduction:body.introduction
+            image: body.image,
+            introduction: body.introduction,
+            first_year_marks: "",
+            second_year_marks: "",
+            third_year_marks: ""
         })
         if (result) {
             return Response.json({

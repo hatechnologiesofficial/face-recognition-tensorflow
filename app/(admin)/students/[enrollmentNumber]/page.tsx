@@ -5,6 +5,7 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
+  ExportOutlined,
   FieldNumberOutlined,
   ReadOutlined,
   TeamOutlined,
@@ -17,6 +18,9 @@ import {
   Card,
   Col,
   Empty,
+  Form,
+  Input,
+  Modal,
   Row,
   Space,
   Statistic,
@@ -28,6 +32,8 @@ import type { TableProps } from "antd";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "../../../components/AppShell";
+import Link from "next/link";
+import { useForm } from "antd/es/form/Form";
 
 type Student = {
   _id: string;
@@ -35,6 +41,9 @@ type Student = {
   enrollmentNumber: number;
   branch: string;
   semester: number;
+  first_year_marks: string,
+  second_year_marks: string,
+  third_year_marks: string
 };
 
 type AttendanceRecord = {
@@ -67,7 +76,8 @@ export default function StudentDetailPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [attendanceLoading, setAttendanceLoading] = useState(false);
-
+  const [form] = useForm()
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const attendancePercent = useMemo(() => {
     if (!attendance.length) {
       return 0;
@@ -76,69 +86,73 @@ export default function StudentDetailPage() {
     return 100;
   }, [attendance.length]);
 
+  const handleUpdateMarks = async (values: any) => {
+    try {
+      setLoading(true)
+      const apiRes = await fetch(`/api/students/${enrollmentNumber}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          ...values,
+          enrollmentNumber
+        })
+      })
+      if (apiRes.ok) {
+        await loadStudentDetails(enrollmentNumber)
+        setIsModalOpen(false)
+      }
+      setLoading(false)
+
+      // const apiJson = await apiRes.json()
+    } catch (error) {
+      setLoading(false)
+    }
+  }
+
+  const loadStudentDetails = async (enrollmentNumber: string) => {
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const studentRes = await fetch(`/api/students/${enrollmentNumber}`);
+      const studentData = await studentRes.json();
+
+      if (!studentRes.ok) {
+        throw new Error(studentData.message || "Student not found");
+      }
+
+
+      setStudent(studentData);
+      setAttendanceLoading(true);
+      form.setFieldValue("first_year_marks",studentData.first_year_marks)
+      form.setFieldValue("second_year_marks",studentData.second_year_marks)
+      form.setFieldValue("third_year_marks",studentData.third_year_marks)
+
+      const attendanceRes = await fetch(`/api/attendence?studentId=${studentData._id}`);
+      const attendanceData = await attendanceRes.json();
+
+      if (!attendanceRes.ok) {
+        throw new Error(attendanceData.message || "Failed to fetch attendance");
+      }
+
+      setAttendance(attendanceData);
+    } catch (fetchError) {
+
+      setError(
+        fetchError instanceof Error
+          ? fetchError.message
+          : "Failed to fetch student details. Please try again later.",
+      );
+      setAttendance([]);
+      setStudent(null);
+    } finally {
+      setAttendanceLoading(false);
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    let isActive = true;
+    loadStudentDetails(enrollmentNumber);
 
-    const loadStudentDetails = async () => {
-      await Promise.resolve();
-
-      if (!isActive) {
-        return;
-      }
-
-      setLoading(true);
-      setError("");
-
-      try {
-        const studentRes = await fetch(`/api/students/${enrollmentNumber}`);
-        const studentData = await studentRes.json();
-
-        if (!studentRes.ok) {
-          throw new Error(studentData.message || "Student not found");
-        }
-
-        if (!isActive) {
-          return;
-        }
-
-        setStudent(studentData);
-        setAttendanceLoading(true);
-
-        const attendanceRes = await fetch(`/api/attendence?studentId=${studentData._id}`);
-        const attendanceData = await attendanceRes.json();
-
-        if (!attendanceRes.ok) {
-          throw new Error(attendanceData.message || "Failed to fetch attendance");
-        }
-
-        if (isActive) {
-          setAttendance(attendanceData);
-        }
-      } catch (fetchError) {
-        if (!isActive) {
-          return;
-        }
-
-        setError(
-          fetchError instanceof Error
-            ? fetchError.message
-            : "Failed to fetch student details. Please try again later.",
-        );
-        setAttendance([]);
-        setStudent(null);
-      } finally {
-        if (isActive) {
-          setAttendanceLoading(false);
-          setLoading(false);
-        }
-      }
-    };
-
-    void loadStudentDetails();
-
-    return () => {
-      isActive = false;
-    };
   }, [enrollmentNumber]);
 
   const columns = useMemo<TableProps<AttendanceRecord>["columns"]>(
@@ -201,9 +215,16 @@ export default function StudentDetailPage() {
             </div>
           </Space>
           <Space wrap>
-            <Button icon={<ArrowLeftOutlined />} onClick={() => router.push("/students")}>
-              Back
+            <Button onClick={() => setIsModalOpen(true)}>
+              Marks
             </Button>
+            <Link href={`/profile/${student?._id}`} target="_blank">
+              <Button
+                disabled={loading}
+                icon={<ExportOutlined />}>
+                View Public Profile
+              </Button>
+            </Link>
           </Space>
         </section>
 
@@ -266,6 +287,31 @@ export default function StudentDetailPage() {
           />
         </Card>
       </Space>
+
+      <Modal
+        title="Update marks"
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onOk={form.submit}
+        loading={loading}
+      >
+
+        <Form
+          form={form}
+          onFinish={handleUpdateMarks}
+          layout="vertical"
+        >
+          <Form.Item label="1st Year" name={"first_year_marks"}>
+            <Input placeholder="Enter 1st Year marks" />
+          </Form.Item>
+          <Form.Item label="2nd Year" name={"second_year_marks"}>
+            <Input placeholder="Enter 2nd Year marks" />
+          </Form.Item>
+          <Form.Item label="3rd Year" name={"third_year_marks"}>
+            <Input placeholder="Enter 3rd Year marks" />
+          </Form.Item>
+        </Form>
+      </Modal>
     </AppShell>
   );
 }

@@ -16,36 +16,42 @@ export default function ProfilePage() {
 
 
   const params = useParams<{ profileId: string }>()
-    const [student, setStudent] = useState<{
-        _id: string,
-        name: string,
-        enrollmentNumber: number,
-        branch: string,
-        semester: number,
-        image:string,
-        introduction:string
-    }>({
-        _id: "",
-        name: "",
-        enrollmentNumber: 0,
-        branch: "",
-        semester: 0,
-        image:"",
-        introduction:""
-    })
-    const [loading, setLoading] = useState(false)
+  const [student, setStudent] = useState<{
+    _id: string,
+    name: string,
+    enrollmentNumber: number,
+    branch: string,
+    semester: number,
+    image: string,
+    introduction: string,
+    first_year_marks: string,
+    second_year_marks: string,
+    third_year_marks: string
+  }>({
+    _id: "",
+    name: "",
+    enrollmentNumber: 0,
+    branch: "",
+    semester: 0,
+    image: "",
+    introduction: "",
+    first_year_marks: "",
+    second_year_marks: "",
+    third_year_marks: ""
+  })
+  const [loading, setLoading] = useState(false)
 
-    const initialiseUserProfile = async (profileId: string) => {
-        setLoading(true)
-        const apiRes = await fetch(`/api/students/${profileId}`)
-        const apiJson = await apiRes.json()
-        setStudent(apiJson)
-        setLoading(false)
-    }
+  const initialiseUserProfile = async (profileId: string) => {
+    setLoading(true)
+    const apiRes = await fetch(`/api/students/id/${profileId}`)
+    const apiJson = await apiRes.json()
+    setStudent(apiJson)
+    setLoading(false)
+  }
 
-    useEffect(() => {
-        initialiseUserProfile(params.profileId)
-    }, [params.profileId])
+  useEffect(() => {
+    initialiseUserProfile(params.profileId)
+  }, [params.profileId])
 
 
 
@@ -70,15 +76,26 @@ export default function ProfilePage() {
           </div>
 
           <nav className="public-profile-actions" aria-label="Profile sections">
-            {profileActions.map((action) => (
-              <Link
-                className={`public-profile-action ${action.className}`}
-                href={action.href}
-                key={action.label}
-              >
-                {action.label}
-              </Link>
-            ))}
+
+            <nav className="public-profile-actions" aria-label="Profile sections">
+
+              <div className={`public-profile-action profile-action-resume`}>
+                <p>{"1st Year"}</p>
+                <br />
+                <h6>{student.first_year_marks}</h6>
+              </div>
+              <div className={`public-profile-action profile-action-projects`}>
+                <p>{"2nd Year"}</p>
+                <br />
+                <h6>{student.second_year_marks}</h6>
+              </div>
+              <div className={`public-profile-action profile-action-contact`}>
+                <p>{"3rd Year"}</p>
+                <br />
+                <h6>{student.third_year_marks}</h6>
+              </div>
+            </nav>
+
           </nav>
         </div>
       </section>
