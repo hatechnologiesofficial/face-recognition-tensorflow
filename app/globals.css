@@ -735,28 +735,84 @@ a:hover {
 }
 
 .public-profile-shell {
-  align-items: center;
+  align-items: stretch;
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 8px;
   box-shadow: 0 24px 80px rgba(15, 23, 42, 0.12);
   display: grid;
   gap: clamp(32px, 5vw, 64px);
-  grid-template-columns: minmax(280px, 480px) minmax(320px, 1fr);
+  grid-template-columns: minmax(280px, 430px) minmax(320px, 1fr);
   margin: 0 auto;
-  max-width: 1120px;
+  max-width: 1180px;
   min-height: calc(100vh - clamp(64px, 12vw, 152px));
   padding: clamp(24px, 4vw, 44px);
+}
+
+.public-profile-visual {
+  align-content: center;
+  background:
+    linear-gradient(180deg, rgba(19, 34, 56, 0.92), rgba(19, 34, 56, 0.76)),
+    #132238;
+  border-radius: 8px;
+  color: #ffffff;
+  display: grid;
+  gap: 24px;
+  justify-items: center;
+  overflow: hidden;
+  padding: clamp(22px, 4vw, 36px);
+  position: relative;
+}
+
+.public-profile-visual::after {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  content: "";
+  height: 260px;
+  position: absolute;
+  right: -96px;
+  top: -96px;
+  width: 260px;
+}
+
+.public-profile-brand {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-self: stretch;
+  position: relative;
+  z-index: 1;
+}
+
+.public-profile-brand span {
+  align-items: center;
+  background: #ffffff;
+  border-radius: 8px;
+  color: #2563eb;
+  display: inline-flex;
+  font-size: 0.92rem;
+  font-weight: 900;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.public-profile-brand strong {
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 900;
 }
 
 .public-profile-photo-wrap {
   aspect-ratio: 1;
   background: #e2e8f0;
-  border: 10px solid #ffffff;
+  border: 8px solid rgba(255, 255, 255, 0.92);
   border-radius: 50%;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.16);
   overflow: hidden;
-  width: min(100%, 480px);
+  position: relative;
+  width: min(100%, 340px);
+  z-index: 1;
 }
 
 .public-profile-photo {
@@ -767,7 +823,46 @@ a:hover {
   width: 100%;
 }
 
+.public-profile-photo-fallback {
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(37, 99, 235, 0.22), rgba(20, 184, 166, 0.2)),
+    #e2e8f0;
+  color: #132238;
+  display: flex;
+  filter: none;
+  font-size: clamp(4rem, 10vw, 6rem);
+  font-weight: 900;
+  justify-content: center;
+}
+
+.public-profile-id-card {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  justify-self: stretch;
+  padding: 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.public-profile-id-card span {
+  color: rgba(255, 255, 255, 0.64);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.public-profile-id-card strong {
+  color: #ffffff;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
 .public-profile-content {
+  align-self: center;
   padding-top: 8px;
 }
 
@@ -824,11 +919,33 @@ a:hover {
   margin: 0;
 }
 
+.public-profile-section-heading {
+  align-items: end;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  margin: 34px 0 14px;
+  max-width: 580px;
+}
+
+.public-profile-section-heading span {
+  color: #0f766e;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.public-profile-section-heading strong {
+  color: #182033;
+  font-size: 0.98rem;
+  font-weight: 900;
+}
+
 .public-profile-actions {
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 38px;
   max-width: 580px;
 }
 
@@ -985,6 +1102,17 @@ a:hover {
     text-align: center;
   }
 
+  .public-profile-visual {
+    width: 100%;
+  }
+
+  .public-profile-brand,
+  .public-profile-id-card {
+    justify-self: center;
+    max-width: 420px;
+    width: 100%;
+  }
+
   .public-profile-photo-wrap {
     width: min(72vw, 420px);
   }
@@ -995,6 +1123,11 @@ a:hover {
 
   .public-profile-actions {
     justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .public-profile-section-heading {
     margin-left: auto;
     margin-right: auto;
   }
@@ -1059,8 +1192,18 @@ a:hover {
   }
 
   .public-profile-content h1 {
-    font-size: clamp(4rem, 22vw, 5rem);
+    font-size: clamp(3rem, 17vw, 4.4rem);
     margin-bottom: 24px;
+  }
+
+  .public-profile-meta {
+    justify-content: center;
+  }
+
+  .public-profile-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
   }
 
   .public-profile-actions {
